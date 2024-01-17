@@ -1,5 +1,5 @@
-# Replace "kafka-console-consumer.sh" 
-# by "kafka-console-consumer" or "kafka-console-consumer.bat" based on your system # (or bin/kafka-console-consumer.sh or bin\windows\kafka-console-consumer.bat if you didn't setup PATH / Environment variables)
+# Replace "kafka-console-consumer"
+# by "kafka-console-consumer" or "kafka-console-consumer.bat" based on your system # (or bin/kafka-console-consumerlocalhost or bin\windows\kafka-console-consumer.bat if you didn't setup PATH / Environment variables)
 
 kafka-console-consumer
 
