@@ -3,4 +3,4 @@ plugins {
 }
 rootProject.name = "hello-kafka"
 include("kafka-basic")
-
+include("kafka-producer-wikimedia")
