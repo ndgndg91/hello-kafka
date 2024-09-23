@@ -16,12 +16,10 @@ fun main() {
     val groupId = "my-java-application"
     val topic = "demo_java"
 
-
     // create Producer Properties
     val properties = Properties()
 
-
-//     connect to Localhost
+    // connect to Localhost
     properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092")
 
 

@@ -20,8 +20,8 @@ dependencies {
     implementation("org.opensearch.client:opensearch-rest-high-level-client:1.2.4")
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.11.0")
-
-
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     testImplementation(kotlin("test"))
 }
 

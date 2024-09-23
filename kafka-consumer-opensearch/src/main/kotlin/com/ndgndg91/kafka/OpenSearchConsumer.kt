@@ -4,12 +4,21 @@ import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.opensearch.action.index.IndexRequest
 import org.opensearch.client.RequestOptions
 import org.opensearch.client.RestClient
 import org.opensearch.client.RestHighLevelClient
 import org.opensearch.client.indices.CreateIndexRequest
 import org.opensearch.client.indices.GetIndexRequest
+import org.opensearch.common.xcontent.XContentType
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import java.net.URI
+import java.time.Duration
+import java.util.*
 
 
 fun main() {
@@ -37,19 +46,65 @@ fun main() {
         RestHighLevelClient(RestClient.builder(HttpHost(connUri.host, connUri.port, connUri.scheme)))
     }
 
+    // create our kafka client
+    val consumer = createKafkaConsumer()
+
     // we need to create the index on OpenSearch if it doesn't exist already
-    restHighLevelClient.use {
-        val indexExists = it.indices().exists(GetIndexRequest("wikimedia"), RequestOptions.DEFAULT)
+    restHighLevelClient.use { openSearchClient ->
+        val indexExists = openSearchClient.indices().exists(GetIndexRequest("wikimedia"), RequestOptions.DEFAULT)
         if (!indexExists) {
             val createIndexRequest = CreateIndexRequest("wikimedia")
-            it.indices().create(createIndexRequest, RequestOptions.DEFAULT)
+            openSearchClient.indices().create(createIndexRequest, RequestOptions.DEFAULT)
+        }
+
+        // subscribe topic
+        consumer.subscribe(listOf("wikimedia.recentchange"))
+
+        while (true) {
+            val records = consumer.poll(Duration.ofMillis(3000))
+            val recordCount = records.count()
+
+            println("Received $recordCount records")
+            records.forEach {
+                val jsonData = removeLogParams(it.value())
+                val indexRequest = IndexRequest("wikimedia")
+                    .source(jsonData, XContentType.JSON)
+                val response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT)
+                println(response.id)
+            }
         }
     }
-
-
-    // create our kafka client
 
     // main code logic
 
     // close things
+}
+
+fun createKafkaConsumer(): KafkaConsumer<String, String> {
+    // create Producer Properties
+    val properties = Properties()
+    val groupId = "consumer-opensearch-demo"
+
+    // connect to Localhost
+    properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092")
+
+    // create consumer configs
+    properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
+    properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
+    properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId)
+    properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+
+    // create a consumer
+    return KafkaConsumer<String, String>(properties)
+}
+
+fun removeLogParams(json: String): String {
+    return try {
+        val rootNode = ObjectMapper().readTree(json)
+        rootNode as ObjectNode
+        rootNode.remove("log_params")
+        rootNode.toString()
+    } catch (e: Exception) {
+        json
+    }
 }

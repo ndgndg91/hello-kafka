@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import java.net.URI
 import java.util.*
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 fun main() {
@@ -46,7 +47,10 @@ fun main() {
     //start the producer in another thread
     eventSource.start()
 
-    // we produce for 10 minutes and block the program until then
-    TimeUnit.MINUTES.sleep(10)
-    eventSource.close()
+    // Schedule to close the eventSource after 10 minutes
+    val scheduler = Executors.newScheduledThreadPool(1)
+    scheduler.schedule({
+        eventSource.close()
+        println("EventSource has been closed after 10 minutes.")
+    }, 10, TimeUnit.MINUTES)
 }
