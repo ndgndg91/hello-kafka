@@ -20,7 +20,6 @@ import java.net.URI
 import java.time.Duration
 import java.util.*
 
-
 fun main() {
     // first create on OpenSearch Client
     val connString = "http://localhost:9200"
@@ -67,8 +66,12 @@ fun main() {
             println("Received $recordCount records")
             records.forEach {
                 val jsonData = removeLogParams(it.value())
+                // 멱등 컨슈머 구현
+                // 1. id 정의 kafka record coordinates 를 통해서 topic - partition - offset
+                // 2. data 에 id 가 있는 경우 이를 그대로 사용한다.
                 val indexRequest = IndexRequest("wikimedia")
-                    .source(jsonData, XContentType.JSON)
+                    .source(jsonData.second, XContentType.JSON)
+                    .id(jsonData.first)
                 val response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT)
                 println(response.id)
             }
@@ -98,13 +101,13 @@ fun createKafkaConsumer(): KafkaConsumer<String, String> {
     return KafkaConsumer<String, String>(properties)
 }
 
-fun removeLogParams(json: String): String {
+fun removeLogParams(json: String): Pair<String, String> {
     return try {
         val rootNode = ObjectMapper().readTree(json)
         rootNode as ObjectNode
         rootNode.remove("log_params")
-        rootNode.toString()
+        Pair(rootNode.get("meta").get("id").asText(), rootNode.toString())
     } catch (e: Exception) {
-        json
+        throw IllegalArgumentException(e)
     }
 }
