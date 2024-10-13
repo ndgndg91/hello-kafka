@@ -16,6 +16,7 @@ import org.opensearch.client.indices.GetIndexRequest
 import org.opensearch.common.xcontent.XContentType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import org.opensearch.action.bulk.BulkRequest
 import java.net.URI
 import java.time.Duration
 import java.util.*
@@ -48,6 +49,7 @@ fun main() {
     // create our kafka client
     val consumer = createKafkaConsumer()
 
+
     // we need to create the index on OpenSearch if it doesn't exist already
     restHighLevelClient.use { openSearchClient ->
         val indexExists = openSearchClient.indices().exists(GetIndexRequest("wikimedia"), RequestOptions.DEFAULT)
@@ -62,6 +64,7 @@ fun main() {
         while (true) {
             val records = consumer.poll(Duration.ofMillis(3000))
             val recordCount = records.count()
+            val bulkRequest = BulkRequest()
 
             println("Received $recordCount records")
             records.forEach {
@@ -72,13 +75,19 @@ fun main() {
                 val indexRequest = IndexRequest("wikimedia")
                     .source(jsonData.second, XContentType.JSON)
                     .id(jsonData.first)
-                val response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT)
-                println(response.id)
+                bulkRequest.add(indexRequest)
             }
 
-            // commit offset after batch is consumed.
-            consumer.commitSync()
-            println("offset committed")
+            if (bulkRequest.numberOfActions() > 0) {
+                val response = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT)
+                println("${response.items.size} record processed")
+
+                // commit offset after batch is consumed.
+                consumer.commitSync()
+                println("offset committed")
+            }
+
+
         }
     }
 
