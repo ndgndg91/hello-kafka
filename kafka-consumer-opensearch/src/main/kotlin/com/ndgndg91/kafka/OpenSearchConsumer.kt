@@ -75,6 +75,10 @@ fun main() {
                 val response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT)
                 println(response.id)
             }
+
+            // commit offset after batch is consumed.
+            consumer.commitSync()
+            println("offset committed")
         }
     }
 
@@ -96,6 +100,7 @@ fun createKafkaConsumer(): KafkaConsumer<String, String> {
     properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
     properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId)
     properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+    properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
 
     // create a consumer
     return KafkaConsumer<String, String>(properties)
