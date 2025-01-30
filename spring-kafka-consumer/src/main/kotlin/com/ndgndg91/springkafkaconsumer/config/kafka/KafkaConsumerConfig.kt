@@ -1,4 +1,4 @@
-package com.ndgndg91.springkafkaconsumer.config
+package com.ndgndg91.springkafkaconsumer.config.kafka
 
 import io.cloudevents.CloudEvent
 import io.cloudevents.kafka.CloudEventDeserializer

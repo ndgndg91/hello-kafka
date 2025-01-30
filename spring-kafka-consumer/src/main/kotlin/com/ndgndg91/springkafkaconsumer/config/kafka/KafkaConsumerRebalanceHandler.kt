@@ -1,4 +1,4 @@
-package com.ndgndg91.springkafkaconsumer.config
+package com.ndgndg91.springkafkaconsumer.config.kafka
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener
 import org.apache.kafka.common.TopicPartition

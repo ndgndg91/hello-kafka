@@ -1,4 +1,4 @@
-package com.ndgndg91.springkafkaconsumer.config
+package com.ndgndg91.springkafkaconsumer.config.kafka
 
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.errors.RecordDeserializationException

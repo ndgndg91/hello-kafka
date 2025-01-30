@@ -1,4 +1,4 @@
-package com.ndgndg91.springkafkaconsumer.config
+package com.ndgndg91.springkafkaconsumer.config.kafka
 
 import com.ndgndg91.springkafkacommon.toJson
 import org.springframework.boot.context.properties.ConfigurationProperties

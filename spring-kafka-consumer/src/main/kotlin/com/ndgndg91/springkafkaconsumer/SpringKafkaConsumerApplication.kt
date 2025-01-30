@@ -3,7 +3,7 @@ package com.ndgndg91.springkafkaconsumer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ndgndg91.springkafkacommon.GIRI_TOPIC
 import com.ndgndg91.springkafkacommon.GiriItem
-import com.ndgndg91.springkafkaconsumer.config.KafkaConsumerConfig.Companion.DEFAULT_KAFKA_LISTENER_CONTAINER_FACTORY
+import com.ndgndg91.springkafkaconsumer.config.kafka.KafkaConsumerConfig.Companion.DEFAULT_KAFKA_LISTENER_CONTAINER_FACTORY
 import io.cloudevents.CloudEvent
 import io.cloudevents.core.CloudEventUtils
 import io.cloudevents.jackson.PojoCloudEventDataMapper
