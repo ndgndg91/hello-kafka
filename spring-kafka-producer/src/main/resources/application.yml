@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: spring-kafka-producer
+
+server:
+  port: 7070
+  shutdown: graceful
+
+giri:
+  kafka:
+    producer:
+      bootstrap-server: localhost:9092
+      acks: all
+      security-protocol: PLAINTEXT

@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: spring-kafka-consumer
+
+giri:
+  kafka:
+    consumer:
+      bootstrap-server: localhost:9092
+      auto-offset-reset: latest
+      sync-commit-timeout-seconds: 5
+      sync-commits: true
+      group-id: GIRI-CONSUMER-GROUP
+      security-protocol: PLAINTEXT
+      enable-auto-commit: false
+      back-off:
+        interval: 3000
+        max-failure: 3
+      dlt:
+        acks: all
+        security-protocol: PLAINTEXT
