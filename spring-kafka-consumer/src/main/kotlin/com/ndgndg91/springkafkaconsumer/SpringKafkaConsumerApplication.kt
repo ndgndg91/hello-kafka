@@ -11,7 +11,6 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.kafka.annotation.KafkaHandler
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component
 @SpringBootApplication
 class SpringKafkaConsumerApplication {
     private val logger = LoggerFactory.getLogger(javaClass)
-    @KafkaHandler
     @KafkaListener(
         topics = [GIRI_TOPIC],
         containerFactory = DEFAULT_KAFKA_LISTENER_CONTAINER_FACTORY
